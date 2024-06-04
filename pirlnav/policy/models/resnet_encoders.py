@@ -17,21 +17,22 @@ class Flatten(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         return torch.flatten(x, start_dim=1)
 
-
+# 定义了一个名为 ResNetEncoder 的类，它继承自 nn.Module，用于在基于观察空间的强化学习环境中实现图像编码器
+# 这个编码器主要基于 ResNet 架构，并且可以处理多种类型的输入（如 RGB 图像、深度图像和语义图像）
 class ResNetEncoder(nn.Module):
     def __init__(
         self,
-        observation_space: spaces.Dict,
-        baseplanes: int = 32,
-        ngroups: int = 32,
-        spatial_size: int = 128,
-        make_backbone=None,
-        normalize_visual_inputs: bool = False,
-        sem_embedding_size=4,
-        dropout_prob: float = 0.0
+        observation_space: spaces.Dict,  # 输入的观察空间，通常包含不同类型的图像数据（如 RGB、深度、语义）
+        baseplanes: int = 32,  # 基础平面数，用于控制网络的通道数
+        ngroups: int = 32,  # 用于 GroupNorm 的分组数量
+        spatial_size: int = 128,  # 初始的空间尺寸
+        make_backbone=None,  # 创建骨干网络的函数
+        normalize_visual_inputs: bool = False,  # 是否对视觉输入进行归一化
+        sem_embedding_size=4,  # 语义嵌入的大小
+        dropout_prob: float = 0.0  # Dropout 的概率，用于正则化
     ):
         super().__init__()
-
+        #  处理 RGB 输入：获取 RGB 图像的尺寸和通道数，如果没有 RGB 图像，则设置通道数为 0
         if "rgb" in observation_space.spaces:
             self._frame_size = tuple(observation_space.spaces["rgb"].shape[:2])
             self._n_input_rgb = observation_space.spaces["rgb"].shape[2]
@@ -39,7 +40,7 @@ class ResNetEncoder(nn.Module):
             spatial_size = observation_space.spaces["rgb"].shape[:2]
         else:
             self._n_input_rgb = 0
-
+        #  处理深度输入：获取深度图像的尺寸和通道数，如果没有深度图像，则设置通道数为 0
         if "depth" in observation_space.spaces:
             self._frame_size = tuple(observation_space.spaces["depth"].shape[:2])
             self._n_input_depth = observation_space.spaces["depth"].shape[2]
@@ -47,13 +48,13 @@ class ResNetEncoder(nn.Module):
             spatial_size = observation_space.spaces["depth"].shape[:2]
         else:
             self._n_input_depth = 0
-        
+        #  处理语义输入：获取语义图像的尺寸，并设置语义嵌入的大小，如果没有语义图像，则设置通道数为 0
         if "semantic" in observation_space.spaces:
             self._frame_size = tuple(observation_space.spaces["semantic"].shape[:2])
             self._n_input_semantics = sem_embedding_size # observation_space.spaces["semantic"].shape[2]
         else:
             self._n_input_semantics = 0
-        
+        #  调整空间尺寸：根据输入图像的尺寸调整 spatial_size
         if self._frame_size == (256, 256):
             spatial_size = (128, 128)
         elif self._frame_size == (240, 320):
@@ -62,18 +63,19 @@ class ResNetEncoder(nn.Module):
             spatial_size = (120, 108)
         elif self._frame_size == (640, 480):
             spatial_size = (108, 120)
-
+        #  初始化归一化模块：如果需要归一化视觉输入，则使用 RunningMeanAndVar 模块，否则使用空的 nn.Sequential() 模块
         if normalize_visual_inputs:
             self.running_mean_and_var: nn.Module = RunningMeanAndVar(
                 self._n_input_depth + self._n_input_rgb
             )
         else:
             self.running_mean_and_var = nn.Sequential()
-
-        if not self.is_blind:
+        #  is_blind 方法用于检查模型是否接收任何视觉输入
+        #  创建骨干网络：
+        if not self.is_blind:   #  如果模型不是盲目的（即有视觉输入），则根据输入通道数创建骨干网络
             input_channels = self._n_input_depth + self._n_input_rgb + self._n_input_semantics
             self.backbone = make_backbone(input_channels, baseplanes, ngroups, dropout_prob=dropout_prob)
-
+            # 计算最终的空间尺寸 final_spatial
             final_spatial = np.array([math.ceil(
                 d * self.backbone.final_spatial_compress
             ) for d in spatial_size])
