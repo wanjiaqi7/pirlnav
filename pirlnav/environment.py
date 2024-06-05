@@ -4,7 +4,7 @@ import habitat
 import numpy as np
 from habitat import Config, Dataset
 
-
+# 这段代码定义了一个名为 SimpleRLEnv 的强化学习环境类，用于在Habitat环境中进行目标导航任务
 @habitat.registry.register_env(name="SimpleRLEnv")
 class SimpleRLEnv(habitat.RLEnv):
     def __init__(self, config: Config, dataset: Optional[Dataset] = None):
