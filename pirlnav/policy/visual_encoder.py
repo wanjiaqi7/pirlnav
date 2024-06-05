@@ -1,4 +1,4 @@
-
+# 这段代码实现了一个视觉编码器类，它使用 ResNet 作为主干网络对图像进行特征提取
 import numpy as np
 import torch
 from habitat_baselines.rl.ddppo.policy.running_mean_and_var import RunningMeanAndVar
