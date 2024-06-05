@@ -2,7 +2,7 @@ import math
 
 import torch.nn as nn
 
-__all__ = ["ResNet", "resnet18", "resnet50", "resnet101"]
+__all__ = ["ResNet", "resnet18", "resnet50", "resnet101"]  # 定义了ResNet网络及其变体，包括 ResNet-18、ResNet-50 和 ResNet-101
 
 
 # fmt: off
@@ -13,7 +13,7 @@ def conv3x3(in_planes, out_planes, stride=1):
     )
 
 
-class BasicBlock(nn.Module):
+class BasicBlock(nn.Module):  # 基本的 ResNet 块，由两个卷积层组成
     expansion = 1
 
     def __init__(
@@ -52,7 +52,7 @@ class BasicBlock(nn.Module):
         return self.relu(out + residual)
 
 
-class Bottleneck(nn.Module):
+class Bottleneck(nn.Module):  # ResNet 的瓶颈块，包含三个卷积层，用于ResNet-50和ResNet-101
     expansion = 4
 
     def __init__(
@@ -112,7 +112,7 @@ def gn_init(m, zero_init=False):
     m.weight.data.fill_(0.0 if zero_init else 1.0)
     m.bias.data.zero_()
 
-
+# ResNet 主体结构的定义，包含多个层级和连接
 class ResNet(nn.Module):
     def __init__(
         self, in_channels, base_planes, ngroups, block, layers, dropout_prob=0.0
