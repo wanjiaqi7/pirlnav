@@ -3,7 +3,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-
+# 更新使得模块更加灵活，能够支持更多种类的 ResNet 变体，并提供了 SE 模块的功能
 from typing import List, Optional, Type, Union, cast
 
 from torch import Tensor
