@@ -1,3 +1,4 @@
+# 这段代码实现了一个用于导航任务的基线模型
 import torch
 import torch.nn as nn
 from gym import Space
@@ -37,7 +38,7 @@ class ObjectNavILMAENet(Net):
         super().__init__()
         self.policy_config = policy_config
         rnn_input_size = 0
-
+        # 设置视觉转换和编码器
         rgb_config = policy_config.RGB_ENCODER
         name = "resize"
         if rgb_config.use_augmentations and run_type == "train":
@@ -48,7 +49,7 @@ class ObjectNavILMAENet(Net):
         self.visual_transform.randomize_environments = (
             rgb_config.randomize_augmentations_over_envs
         )
-
+        # 初始化视觉编码器
         self.visual_encoder = VisualEncoder(
             image_size=rgb_config.image_size,
             backbone=rgb_config.backbone,
@@ -58,7 +59,7 @@ class ObjectNavILMAENet(Net):
             avgpooled_image=rgb_config.avgpooled_image,
             drop_path_rate=rgb_config.drop_path_rate,
         )
-
+        # 设置视觉编码器的全连接层
         self.visual_fc = nn.Sequential(
             nn.Flatten(),
             nn.Linear(
@@ -69,10 +70,12 @@ class ObjectNavILMAENet(Net):
         )
 
         rnn_input_size += policy_config.RGB_ENCODER.hidden_size
+        # 日志记录；记录使用的 RGB 编码器的骨干网络类型
         logger.info(
             "RGB encoder is {}".format(policy_config.RGB_ENCODER.backbone)
         )
-
+        # 初始化其他传感器的嵌入层
+        # 初始化GPS传感器的嵌入层
         if EpisodicGPSSensor.cls_uuid in observation_space.spaces:
             input_gps_dim = observation_space.spaces[
                 EpisodicGPSSensor.cls_uuid
@@ -80,7 +83,7 @@ class ObjectNavILMAENet(Net):
             self.gps_embedding = nn.Linear(input_gps_dim, 32)
             rnn_input_size += 32
             logger.info("\n\nSetting up GPS sensor")
-
+        # 初始化指南针传感器的嵌入层
         if EpisodicCompassSensor.cls_uuid in observation_space.spaces:
             assert (
                 observation_space.spaces[EpisodicCompassSensor.cls_uuid].shape[
@@ -95,7 +98,7 @@ class ObjectNavILMAENet(Net):
             )
             rnn_input_size += 32
             logger.info("\n\nSetting up Compass sensor")
-
+        # 初始化目标物体传感器的嵌入层
         if ObjectGoalSensor.cls_uuid in observation_space.spaces:
             self._n_object_categories = (
                 int(
@@ -111,14 +114,14 @@ class ObjectNavILMAENet(Net):
             )
             rnn_input_size += 32
             logger.info("\n\nSetting up Object Goal sensor")
-
+        # 初始化先前动作的嵌入层
         if policy_config.SEQ2SEQ.use_prev_action:
             self.prev_action_embedding = nn.Embedding(num_actions + 1, 32)
             rnn_input_size += self.prev_action_embedding.embedding_dim
 
         self.rnn_input_size = rnn_input_size
 
-        # load pretrained weights
+        # load pretrained weights 加载预训练的视觉编码器权重
         if rgb_config.pretrained_encoder is not None:
             msg = load_encoder(
                 self.visual_encoder, rgb_config.pretrained_encoder
@@ -129,7 +132,7 @@ class ObjectNavILMAENet(Net):
                 )
             )
 
-        # freeze backbone
+        # freeze backbone 冻结视觉编码器的骨干网络参数
         if rgb_config.freeze_backbone:
             for p in self.visual_encoder.backbone.parameters():
                 p.requires_grad = False
@@ -139,7 +142,7 @@ class ObjectNavILMAENet(Net):
                 rnn_input_size, hidden_size, rnn_type, num_recurrent_layers
             )
         )
-
+        # 初始化 RNN 状态编码器
         self.state_encoder = build_rnn_state_encoder(
             rnn_input_size,
             hidden_size=hidden_size,
