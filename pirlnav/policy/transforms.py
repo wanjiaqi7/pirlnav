@@ -1,3 +1,5 @@
+# 这段代码实现了一些用于图像预处理和数据增强的类，
+# 主要包括随机偏移（RandomShiftsAug）、调整图像大小（ResizeTransform）和结合随机偏移与颜色抖动（ShiftAndJitterTransform）的变换
 from typing import Optional
 
 import torch
@@ -7,7 +9,7 @@ import torchvision.transforms.functional as TF
 from torchvision.transforms import ColorJitter, RandomApply
 
 
-class RandomShiftsAug(nn.Module):
+class RandomShiftsAug(nn.Module):  # 用于实现随机图像平移
     def __init__(self, pad):
         super().__init__()
         self.pad = pad
@@ -34,7 +36,7 @@ class RandomShiftsAug(nn.Module):
         return F.grid_sample(x, grid, padding_mode="zeros", align_corners=False)
 
 
-class Transform:
+class Transform:  # 定义了一个图像变换的抽象基类
     randomize_environments: bool = False
 
     def apply(self, x: torch.Tensor):
@@ -71,7 +73,7 @@ class Transform:
         return x
 
 
-class ResizeTransform(Transform):
+class ResizeTransform(Transform):  # 继承自Transform，用于调整图像大小
     def __init__(self, size):
         self.size = size
 
@@ -83,7 +85,7 @@ class ResizeTransform(Transform):
         return x
 
 
-class ShiftAndJitterTransform(Transform):
+class ShiftAndJitterTransform(Transform):  # 继承自Transform，用于结合随机平移和颜色抖动
     def __init__(self, augmentations_name, size):
         self.size = size
         self.augmentations_name = augmentations_name
