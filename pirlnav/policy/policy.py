@@ -3,6 +3,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+# 这段代码定义了一个使用PyTorch实现的强化学习中的模仿学习策略（ILPolicy）
 import abc
 
 from habitat import logger
@@ -11,7 +12,7 @@ from habitat_baselines.utils.common import CategoricalNet
 from torch import nn as nn
 
 
-class ILPolicy(nn.Module, Policy):
+class ILPolicy(nn.Module, Policy):  # Policy很可能是一个提供了强化学习算法所需方法的接口或抽象类
     def __init__(
         self,
         net,
@@ -117,8 +118,8 @@ class ILPolicy(nn.Module, Policy):
     def from_config(cls, config, observation_space, action_space):
         pass
 
-
-class CriticHead(nn.Module):
+# 简单的评论者网络，它接受输入特征并输出表示状态值的单个值
+class CriticHead(nn.Module):  
     def __init__(self, input_size):
         super().__init__()
         self.fc = nn.Linear(input_size, 1)
@@ -128,7 +129,7 @@ class CriticHead(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-
+# 具有多层感知器架构的更复杂的评论者网络
 class MLPCriticHead(nn.Module):
     def __init__(self, input_size, hidden_dim=512):
         super().__init__()
