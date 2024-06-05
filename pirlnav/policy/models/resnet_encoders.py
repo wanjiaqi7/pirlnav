@@ -12,12 +12,13 @@ from torch import Tensor
 
 from pirlnav.policy.models import resnet
 
-
+#  这个类将输入张量展平，从第一个维度（即批量维度）之后的所有维度展平为一个维度
 class Flatten(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         return torch.flatten(x, start_dim=1)
 
-# 定义了一个名为 ResNetEncoder 的类，它继承自 nn.Module，用于在基于观察空间的强化学习环境中实现图像编码器
+# 定义了一个名为 ResNetEncoder 的类，它继承自 nn.Module，用于在基于观察空间的强化学习环境中实现图像编码器，
+# ResNetEncoder 类主要功能是通过骨干网络处理多种输入数据，并通过压缩层将高维特征压缩成更紧凑的表示
 # 这个编码器主要基于 ResNet 架构，并且可以处理多种类型的输入（如 RGB 图像、深度图像和语义图像）
 class ResNetEncoder(nn.Module):
     def __init__(
@@ -73,38 +74,40 @@ class ResNetEncoder(nn.Module):
         #  is_blind 方法用于检查模型是否接收任何视觉输入
         #  创建骨干网络：
         if not self.is_blind:   #  如果模型不是盲目的（即有视觉输入），则根据输入通道数创建骨干网络
-            input_channels = self._n_input_depth + self._n_input_rgb + self._n_input_semantics
-            self.backbone = make_backbone(input_channels, baseplanes, ngroups, dropout_prob=dropout_prob)
-            # 计算最终的空间尺寸 final_spatial
+            input_channels = self._n_input_depth + self._n_input_rgb + self._n_input_semantics  # input_channels 是所有输入（RGB、深度和语义）通道数的总和
+            self.backbone = make_backbone(input_channels, baseplanes, ngroups, dropout_prob=dropout_prob)  # 使用 make_backbone 函数创建，这个函数定义了实际的 ResNet 架构
+            # 压缩空间计算
+            # 计算最终的空间尺寸 final_spatial ：通过乘以 self.backbone.final_spatial_compress（骨干网络的空间压缩因子）来计算
             final_spatial = np.array([math.ceil(
                 d * self.backbone.final_spatial_compress
             ) for d in spatial_size])
-            after_compression_flat_size = 2048
+            after_compression_flat_size = 2048  # 压缩后的平面大小，设置为 2048
             num_compression_channels = int(
                 round(after_compression_flat_size / np.prod(final_spatial))
-            )
+            )  # 是压缩通道数，通过压缩后的平面大小除以压缩空间的大小计算得到
+            #  压缩层
             self.compression = nn.Sequential(
-                nn.Conv2d(
+                nn.Conv2d(                             #  一个 Conv2d 层，调整通道数
                     self.backbone.final_channels,
                     num_compression_channels,
                     kernel_size=3,
                     padding=1,
                     bias=False,
                 ),
-                nn.GroupNorm(1, num_compression_channels),
-                nn.ReLU(True),
+                nn.GroupNorm(1, num_compression_channels),   # 一个 GroupNorm 层，进行分组归一化
+                nn.ReLU(True),    
             )
 
-            self.output_shape = (
+            self.output_shape = (              # 是压缩后特征图的形状，包括通道数和空间大小
                 num_compression_channels,
                 final_spatial[0],
                 final_spatial[1],
             )
 
     @property
-    def is_blind(self):
+    def is_blind(self):   # 用于判断是否没有任何输入通道，如果 RGB、深度和语义通道数总和为 0，则认为模型没有输入（即“盲”状态）
         return self._n_input_rgb + self._n_input_depth + self._n_input_semantics == 0
-
+    # 网络层初始化
     def layer_init(self):
         for layer in self.modules():
             if isinstance(layer, (nn.Conv2d, nn.Linear)):
@@ -115,9 +118,9 @@ class ResNetEncoder(nn.Module):
                     nn.init.constant_(layer.bias, val=0)
 
     def forward(self, observations: Dict[str, torch.Tensor]) -> torch.Tensor:  # type: ignore
-        if self.is_blind:
+        if self.is_blind:  # 检查是否没有输入
             return None
-
+        # 处理 RGB 输入
         cnn_input = []
         if self._n_input_rgb > 0:
             rgb_observations = observations["rgb"]
@@ -125,7 +128,7 @@ class ResNetEncoder(nn.Module):
             rgb_observations = rgb_observations.permute(0, 3, 1, 2)
             rgb_observations = rgb_observations / 255.0  # normalize RGB
             cnn_input.append(rgb_observations)
-
+        # 处理深度输入
         if self._n_input_depth > 0:
             depth_observations = observations["depth"]
 
@@ -133,7 +136,7 @@ class ResNetEncoder(nn.Module):
             depth_observations = depth_observations.permute(0, 3, 1, 2)
 
             cnn_input.append(depth_observations)
-
+        # 处理语义输入
         if self._n_input_semantics > 0:
             semantic_observations = observations["semantic"]
 
@@ -151,13 +154,13 @@ class ResNetEncoder(nn.Module):
             x = F.avg_pool2d(x, (4, 5))
         elif self._frame_size == (640, 480):
             x = F.avg_pool2d(x, (5, 4))
-
+        # 归一化和特征提取
         x = self.running_mean_and_var(x)
         x = self.backbone(x)
         x = self.compression(x)
         return x
 
-
+# 是一个基于 ResNet 的深度图编码器。它可以加载预训练的权重，并根据需求输出紧凑的特征向量或空间特征图
 class VlnResnetDepthEncoder(nn.Module):
     def __init__(
         self,
@@ -254,7 +257,7 @@ class VlnResnetDepthEncoder(nn.Module):
             return torch.cat([x, spatial_features], dim=1)
         else:
             return self.visual_fc(x)
-
+# 一个基于 ResNet 的 RGB 图像编码器。它可以处理 RGB 图像，提取特征，并根据需求输出紧凑的特征向量或空间特征图
 class ResnetRGBEncoder(nn.Module):
     def __init__(
         self,
