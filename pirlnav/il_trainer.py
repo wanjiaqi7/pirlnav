@@ -3,6 +3,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+# 这个代码主要用于实现一个基于IL（模仿学习）和DDPPO（分布式近端策略优化）的强化学习训练器
+# 旨在训练智能体在Habitat环境中进行导航任务
 
 import contextlib
 import os
@@ -57,7 +59,8 @@ from pirlnav.common.rollout_storage import RolloutStorage
 class ILEnvDDPTrainer(PPOTrainer):
     def __init__(self, config=None):
         super().__init__(config)
-
+            max_grad_norm=il_cfg.max_grad_norm,
+    # 初始化actor-critic模型和智能体，包括设置观测空间、动作空间，并将模型和智能体移动到指定设备（CPU或GPU）
     def _setup_actor_critic_agent(self, il_cfg: Config) -> None:
         r"""Sets up actor critic and agent for IL.
 
@@ -93,7 +96,7 @@ class ILEnvDDPTrainer(PPOTrainer):
             wd=il_cfg.wd,
             entropy_coef=il_cfg.entropy_coef,
         )
-
+    # 初始化训练过程，包括加载先前的训练状态、设置分布式训练、初始化环境等
     def _init_train(self):
         resume_state = load_resume_state(self.config)
         if resume_state is not None:
@@ -307,7 +310,7 @@ class ILEnvDDPTrainer(PPOTrainer):
         )
 
     @profiling_wrapper.RangeContext("train")
-    def train(self) -> None:
+    def train(self) -> None:   # 训练的主循环，管理整个训练过程，包括采集训练数据、更新智能体、记录和保存检查点
         r"""Main method for training DD/PPO.
 
         Returns:
@@ -536,7 +539,7 @@ class ILEnvDDPTrainer(PPOTrainer):
                     ),
                 )
             )
-
+    # 用于评估训练的检查点，通过加载检查点和运行评估环境来评估智能体的性能
     def _eval_checkpoint(
         self,
         checkpoint_path: str,
