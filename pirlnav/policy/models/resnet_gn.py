@@ -1,3 +1,4 @@
+# 这个代码定义了一些用于构建不同类型ResNet模型的模块。ResNet（残差网络）是一种深度卷积神经网络架构，广泛用于图像分类和其他计算机视觉任务
 import math
 
 import torch.nn as nn
