@@ -1,3 +1,4 @@
+# 这段代码定义了几个神经网络组件，用于视觉特征提取，特别是针对Habitat环境
 import math
 from typing import Dict
 
