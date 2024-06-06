@@ -1,3 +1,4 @@
+# 为 habitat 环境中的任务提供稀疏的奖励信号。
 from typing import Any
 
 from habitat.config import Config
@@ -6,7 +7,8 @@ from habitat.core.registry import registry
 from habitat.core.simulator import Simulator
 from habitat.tasks.nav.nav import Success
 
-
+# SparseReward 类继承自 Measure，表明它是 habitat 环境的一个自定义测量
+# 测量类根据任务的成功与否给出相应的奖励值，如果任务成功，则奖励为预先设定的成功奖励值，否则为零
 @registry.register_measure
 class SparseReward(Measure):
     cls_uuid: str = "sparse_reward"
