@@ -4,7 +4,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 # 这个代码主要用于实现一个基于IL（模仿学习）和DDPPO（分布式近端策略优化）的强化学习训练器
-# 旨在训练智能体在Habitat环境中进行导航任务
+# 通过模仿专家的行为和自主学习来优化智能体的策略，旨在训练智能体在Habitat环境中进行导航任务
 
 import contextlib
 import os
