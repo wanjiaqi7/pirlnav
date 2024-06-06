@@ -5,7 +5,7 @@ import torch.nn as nn
 
 __all__ = ["ResNet", "resnet18", "resnet50", "resnet101"]  # 定义了ResNet网络及其变体，包括 ResNet-18、ResNet-50 和 ResNet-101
 
-
+# 定义ResNet模型中所需的基本组件，如3x3卷积层
 # fmt: off
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -13,7 +13,10 @@ def conv3x3(in_planes, out_planes, stride=1):
         in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False
     )
 
-
+# 定义ResNet的基本块（BasicBlock和Bottleneck）
+# 这些块是ResNet架构的基础组件，分别用于不同深度的ResNet模型
+# BasicBlock：用于较浅的ResNet（如ResNet-18）
+# Bottleneck：用于较深的ResNet（如ResNet-50、ResNet-101）
 class BasicBlock(nn.Module):  # 基本的 ResNet 块，由两个卷积层组成
     expansion = 1
 
@@ -112,8 +115,9 @@ def gn_init(m, zero_init=False):
     assert isinstance(m, nn.GroupNorm)
     m.weight.data.fill_(0.0 if zero_init else 1.0)
     m.bias.data.zero_()
-
-# ResNet 主体结构的定义，包含多个层级和连接
+# 构建ResNet模型的整体架构，结合前面定义的基础组件和块，实现ResNet的具体版本
+# 是ResNet主体结构的定义，包含多个层级和连接
+# 通过_make_layer方法，可以创建不同的层次结构，并灵活地应用不同的块（如BasicBlock或Bottleneck）和层数配置
 class ResNet(nn.Module):
     def __init__(
         self, in_channels, base_planes, ngroups, block, layers, dropout_prob=0.0
@@ -200,7 +204,7 @@ class ResNet(nn.Module):
 
         return x
 
-
+# 定义函数来创建具体版本的ResNet模型，如resnet18、resnet50和resnet101
 def resnet18(in_channels, base_planes, ngroups, dropout_prob=0.0):
     model = ResNet(
         in_channels,
