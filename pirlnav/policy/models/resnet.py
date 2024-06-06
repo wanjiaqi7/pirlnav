@@ -3,6 +3,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+# 这段代码定义了一些用于构建不同类型ResNet变体的神经网络组件。这些组件包括基本块、瓶颈块、以及包含注意力机制的SE块
 # 更新使得模块更加灵活，能够支持更多种类的 ResNet 变体，并提供了 SE 模块的功能
 from typing import List, Optional, Type, Union, cast
 
