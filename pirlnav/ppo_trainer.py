@@ -51,7 +51,7 @@ from pirlnav.utils.lr_scheduler import PIRLNavLRScheduler
 class PIRLNavPPOTrainer(PPOTrainer):
     def __init__(self, config=None):
         super().__init__(config)
-
+    # 配置Actor-Critic代理
     def _setup_actor_critic_agent(self, ppo_cfg: Config) -> None:
         r"""Sets up actor critic and agent for PPO.
         Args:
@@ -59,8 +59,8 @@ class PIRLNavPPOTrainer(PPOTrainer):
         Returns:
             None
         """
-        logger.add_filehandler(self.config.LOG_FILE)
-
+        logger.add_filehandler(self.config.LOG_FILE)   # 设置日志文件
+        # 获取策略
         policy = baseline_registry.get_policy(self.config.RL.POLICY.name)
         observation_space = self.obs_space
         self.obs_transforms = get_active_obs_transforms(self.config)
@@ -69,13 +69,15 @@ class PIRLNavPPOTrainer(PPOTrainer):
         )
 
         logger.info("Setting up policy in PIRLNav trainer..........")
-
+        
+        # 初始化Actor-Critic
         self.actor_critic = policy.from_config(
             self.config, observation_space, self.policy_action_space
         )
         self.obs_space = observation_space
         self.actor_critic.to(self.device)
-
+        
+        # 加载预训练权重
         if (
             self.config.RL.DDPPO.pretrained_encoder
             or self.config.RL.DDPPO.pretrained
@@ -101,15 +103,18 @@ class PIRLNavPPOTrainer(PPOTrainer):
                 }
             )
 
+        # 冻结编码器
         if not self.config.RL.DDPPO.train_encoder:
             self._static_encoder = True
             for param in self.actor_critic.net.visual_encoder.parameters():
                 param.requires_grad_(False)
 
+        # 重置Critic权重
         if self.config.RL.DDPPO.reset_critic:
             nn.init.orthogonal_(self.actor_critic.critic.fc.weight)
             nn.init.constant_(self.actor_critic.critic.fc.bias, 0)
-
+        
+        # 初始化代理
         self.agent = (DDPPO if self._is_distributed else PPO)(
             actor_critic=self.actor_critic,
             clip_param=ppo_cfg.clip_param,
@@ -122,7 +127,8 @@ class PIRLNavPPOTrainer(PPOTrainer):
             max_grad_norm=ppo_cfg.max_grad_norm,
             use_normalized_advantage=ppo_cfg.use_normalized_advantage,
         )
-
+  
+    # 训练方法：包含初始化、收集数据、更新策略、记录日志等步骤。
     @profiling_wrapper.RangeContext("train")
     def train(self) -> None:
         r"""Main method for training DD/PPO.
