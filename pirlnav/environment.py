@@ -1,10 +1,11 @@
+# 这段代码定义了一个名为 SimpleRLEnv 的强化学习环境类，用于在Habitat环境中进行目标导航任务
 from typing import Optional
 
 import habitat
 import numpy as np
 from habitat import Config, Dataset
 
-# 这段代码定义了一个名为 SimpleRLEnv 的强化学习环境类，用于在Habitat环境中进行目标导航任务
+# 这个环境是基于 Habitat 平台的 RLEnv 类定义的，它是一个注册的环境，可以在 Habitat 中被识别和使用
 @habitat.registry.register_env(name="SimpleRLEnv")
 class SimpleRLEnv(habitat.RLEnv):
     def __init__(self, config: Config, dataset: Optional[Dataset] = None):
