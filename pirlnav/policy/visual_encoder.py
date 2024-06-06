@@ -1,4 +1,5 @@
 # 这段代码实现了一个视觉编码器类，它使用 ResNet 作为主干网络对图像进行特征提取
+# 提供了一个模块化的框架，可以对输入图像进行标准化、池化、特征提取和压缩操作。通过动态选择不同的 ResNet 变体作为骨干网络，可以灵活调整特征提取的复杂度和效果
 import numpy as np
 import torch
 from habitat_baselines.rl.ddppo.policy.running_mean_and_var import RunningMeanAndVar
