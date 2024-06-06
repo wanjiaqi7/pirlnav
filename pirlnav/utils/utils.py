@@ -1,3 +1,5 @@
+# 主要用于辅助训练和评估过程中的各种操作 
+# 包括处理数据、生成视频、学习率调整、写入JSON文件等
 import glob
 import gzip
 import json
@@ -19,7 +21,7 @@ from torch import Tensor
 
 from pirlnav.policy.models.resnet_gn import ResNet
 
-
+# 从指定路径加载编码器的参数
 def load_encoder(encoder, path):
     assert os.path.exists(path)
     if isinstance(encoder.backbone, ResNet):
@@ -31,7 +33,7 @@ def load_encoder(encoder, path):
     else:
         raise ValueError("unknown encoder backbone")
 
-
+# 将观测信息转换为单帧图像
 def observations_to_image(observation: Dict, info: Dict) -> np.ndarray:
     r"""Generate image of single frame from observation and info
     returned from a single environment step().
@@ -93,7 +95,7 @@ def observations_to_image(observation: Dict, info: Dict) -> np.ndarray:
         render_frame = np.concatenate((render_frame, top_down_map), axis=1)
     return render_frame
 
-
+# 生成视频文件
 def generate_video(
     video_option: List[str],
     video_dir: Optional[str],
@@ -133,7 +135,7 @@ def generate_video(
         assert video_dir is not None
         images_to_video(images, video_dir, video_name, verbose=verbose)
 
-
+# 将信息添加到图像中
 def add_info_to_image(frame, info):
     string = "d2g: {} | a2g: {} |\nsimple reward: {} |\nsuccess: {} | angle success: {}".format(
         round(info["distance_to_goal"], 3),
@@ -145,24 +147,24 @@ def add_info_to_image(frame, info):
     frame = append_text_to_image(frame, string)
     return frame
 
-
+# 将数据写入JSON文件
 def write_json(data, path):
     with open(path, "w") as file:
         file.write(json.dumps(data))
 
-
+# 从压缩的JSON文件加载数据集
 def load_dataset(path):
     with gzip.open(path, "rb") as file:
         data = json.loads(file.read(), encoding="utf-8")
     return data
 
-
+# 从JSON文件加载数据集
 def load_json_dataset(path):
     file = open(path, "r")
     data = json.loads(file.read())
     return data
 
-
+# 将输入转换为PyTorch张量
 def _to_tensor(v: Union[Tensor, ndarray]) -> torch.Tensor:
     if torch.is_tensor(v):
         return v
@@ -177,7 +179,7 @@ def _to_tensor(v: Union[Tensor, ndarray]) -> torch.Tensor:
 
 @torch.no_grad()
 @profiling_wrapper.RangeContext("batch_obs")
-def batch_obs(
+def batch_obs(                   # 将批量观测信息转换为张量
     observations: List[Dict],
     device: Optional[torch.device] = None,
 ) -> Dict[str, torch.Tensor]:
@@ -205,7 +207,7 @@ def batch_obs(
 
     return batch_t
 
-
+# ：线性学习率预热
 def linear_warmup(
     epoch: int, start_update: int, max_updates: int, start_lr: int, end_lr: int
 ) -> float:
@@ -235,7 +237,7 @@ def linear_warmup(
     # logger.info("{}, {}, {}, {}, {}, {}".format(epoch, start_update, max_updates, start_lr, end_lr, step_lr))
     return step_lr
 
-
+# 评论者线性衰减学习率
 def critic_linear_decay(
     epoch: int, start_update: int, max_updates: int, start_lr: int, end_lr: int
 ) -> float:
