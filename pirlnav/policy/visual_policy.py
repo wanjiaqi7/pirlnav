@@ -1,4 +1,6 @@
 # 这段代码实现了一个用于导航任务的基线模型
+# 这是一个基于序列到序列模型的导航任务的策略网络
+# 它可以学习从观测中提取信息并生成适当的动作来实现导航目标
 import torch
 import torch.nn as nn
 from gym import Space
@@ -24,6 +26,8 @@ class ObjectNavILMAENet(Net):
         RGB encoder
         RNN state encoder
     """
+    # 该类定义了一个基线序列到序列网络，它将指令、RGB图像和深度编码连接起来，
+    # 然后通过RNN解码出动作分布。该网络具有多个模块，包括指令编码器、深度编码器、RGB编码器和RNN状态编码器。
 
     def __init__(
         self,
