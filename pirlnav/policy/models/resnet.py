@@ -3,8 +3,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+# 定义不同变体的ResNet模型。
+# 这些模型包括经典的ResNet架构、ResNeXt架构以及包含SE模块的ResNet和ResNeXt。
 # 这段代码定义了一些用于构建不同类型ResNet变体的神经网络组件。这些组件包括基本块、瓶颈块、以及包含注意力机制的SE块
-# 更新使得模块更加灵活，能够支持更多种类的 ResNet 变体，并提供了 SE 模块的功能
 from typing import List, Optional, Type, Union, cast
 
 from torch import Tensor
@@ -12,7 +13,7 @@ from torch import nn as nn
 from torch.nn.modules.container import Sequential
 from torch.nn.modules.conv import Conv2d
 
-
+# 基础卷积函数
 def conv3x3(
     in_planes: int, out_planes: int, stride: int = 1, groups: int = 1
 ) -> Conv2d:
@@ -34,7 +35,7 @@ def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> Conv2d:
         in_planes, out_planes, kernel_size=1, stride=stride, bias=False
     )
 
-
+# 实现了ResNet中的基本块
 class BasicBlock(nn.Module):
     expansion = 1
     resneXt = False
@@ -69,7 +70,7 @@ class BasicBlock(nn.Module):
 
         return self.relu(out + residual)
 
-
+# 用于构建瓶颈块的卷积分支，瓶颈块在ResNet中用于更深层的网络结构
 def _build_bottleneck_branch(
     inplanes: int,
     planes: int,
@@ -89,7 +90,7 @@ def _build_bottleneck_branch(
         nn.GroupNorm(ngroups, planes * expansion),
     )
 
-
+# 现了Squeeze-and-Excitation模块，用于提升模型对特征的表示能力
 class SE(nn.Module):
     def __init__(self, planes, r=16):
         super().__init__()
@@ -113,7 +114,7 @@ class SE(nn.Module):
 def _build_se_branch(planes, r=16):
     return SE(planes, r)
 
-
+# 实现了ResNet中的瓶颈块
 class Bottleneck(nn.Module):
     expansion = 4
     resneXt = False
@@ -152,7 +153,7 @@ class Bottleneck(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         return self._impl(x)
 
-
+# 含SE模块的瓶颈块
 class SEBottleneck(Bottleneck):
     def __init__(
         self,
@@ -180,12 +181,12 @@ class SEBottleneck(Bottleneck):
 
         return self.relu(out + identity)
 
-
+# 结合了ResNeXt和SE模块，进一步提升模型性能
 class SEResNeXtBottleneck(SEBottleneck):
     expansion = 2
     resneXt = True
 
-
+# ResNeXt架构的实现
 class ResNeXtBottleneck(Bottleneck):
     expansion = 2
     resneXt = True
@@ -193,7 +194,7 @@ class ResNeXtBottleneck(Bottleneck):
 
 Block = Union[Type[Bottleneck], Type[BasicBlock]]
 
-
+# ResNet模型，定义了整个网络结构
 class ResNet(nn.Module):
     def __init__(
         self,
@@ -281,7 +282,7 @@ class ResNet(nn.Module):
 
         return x
 
-
+# 创建具体ResNet模型的函数
 def resnet18(in_channels, base_planes, ngroups, dropout_prob=0.0):
     model = ResNet(in_channels, base_planes, ngroups, BasicBlock, [2, 2, 2, 2])
 
