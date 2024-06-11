@@ -36,7 +36,7 @@ set -x
 echo "In ObjectNav IL eval"
 srun python -u -m run \
 --exp-config $config \
---run-type eval \
+--run-type eval \             # 目的是进行评估，配置了一个评估任务，使用给定的数据集和检查点目录，用于在现有模型上进行性能评估。
 TENSORBOARD_DIR $TENSORBOARD_DIR \
 EVAL_CKPT_PATH_DIR $EVAL_CKPT_PATH_DIR \
 NUM_ENVIRONMENTS 20 \
