@@ -1,3 +1,6 @@
+# 是一个 SLURM 作业脚本，用于在具有 GPU 的集群上运行一个名为 "pirlnav" 的作业 
+# SLURM(Simple Linux Utility for Resource Management) 是一个开源的集群资源管理器，用于管理大规模的计算集群资源。S
+
 #!/bin/bash
 #SBATCH --job-name=pirlnav
 #SBATCH --gres gpu:4
@@ -11,9 +14,9 @@
 #SBATCH --error=slurm_logs/ddpil-train-%j.err
 #SBATCH --requeue
 
-source /srv/flash1/rramrakhya6/miniconda3/etc/profile.d/conda.sh
+source /srv/flash1/rramrakhya6/miniconda3/etc/profile.d/conda.sh   #  用于加载 Conda 环境的路径
 conda deactivate
-conda activate pirlnav
+conda activate pirlnav  # 激活名为 Conda 环境，用于执行训练任务
 
 export GLOG_minloglevel=2
 export MAGNUM_LOG=quiet
@@ -22,7 +25,7 @@ export HABITAT_SIM_LOG=quiet
 MASTER_ADDR=$(srun --ntasks=1 hostname 2>&1 | tail -n1)
 export MASTER_ADDR
 
-cd /srv/flash1/rramrakhya6/spring_2022/pirlnav
+cd /srv/flash1/rramrakhya6/spring_2022/pirlnav   #  切换到 pirlnav 项目的目录
 
 dataset=$1
 
@@ -42,7 +45,7 @@ mkdir -p $CHECKPOINT_DIR
 set -x
 
 echo "In ObjectNav IL DDP"
-srun python -u -m run \
+srun python -u -m run \          # srun 命令用于在集群上启动Python脚本。其路径可能是run模块的相对路径。
 --exp-config $config \
 --run-type train \
 TENSORBOARD_DIR $TENSORBOARD_DIR \
