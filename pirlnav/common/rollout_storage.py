@@ -1,3 +1,5 @@
+# 实现了一个强化学习中的RolloutStorage类，用于存储和管理策略网络在环境交互过程中生成的数据。
+# 它负责存储在强化学习训练过程中生成的观测、动作、奖励、隐藏状态等数据。
 #!/usr/bin/env python3
 
 # Copyright (c) Facebook, Inc. and its affiliates.
