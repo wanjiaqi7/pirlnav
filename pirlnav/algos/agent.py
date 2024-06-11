@@ -1,3 +1,5 @@
+# 定义一个用于模仿学习和分布式训练（Distributed Training）的强化学习代理（RL Agent）。
+# 这个代理可以使用指定的优化器、学习率和其他训练参数来更新模型，以在模拟环境中完成特定任务。
 #!/usr/bin/env python3
 
 # Copyright (c) Facebook, Inc. and its affiliates.
@@ -13,7 +15,7 @@ from torch import Tensor
 from torch import nn as nn
 from torch import optim as optim
 
-
+# 模型初始化。在ILAgent类中，actor_critic模型作为策略网络，负责预测动作。
 class ILAgent(nn.Module):
     def __init__(
         self,
@@ -76,7 +78,8 @@ class ILAgent(nn.Module):
 
     def forward(self, *x):
         raise NotImplementedError
-
+    
+    # 模仿学习更新策略
     def update(self, rollouts) -> Tuple[float, float, float]:
         total_loss_epoch = 0.0
         total_entropy = 0.0
@@ -163,7 +166,7 @@ class ILAgent(nn.Module):
 
 EPS_PPO = 1e-5
 
-
+# 分布式训练，确保模型参数在多个计算节点间同步，并在反向传播中正确处理梯度。
 class DecentralizedDistributedMixin:
     def init_distributed(self, find_unused_params: bool = True) -> None:
         r"""Initializes distributed training for the model
