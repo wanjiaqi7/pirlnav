@@ -1,4 +1,5 @@
-# 这段配置文件详细定义了在ObjectNav任务上使用模仿学习和强化学习进行训练和评估的各种参数。具体配置包括任务路径、GPU设置、训练参数、评估设置、日志输出、以及模仿学习和强化学习的细节。
+# 这段配置文件是用于训练和评估ObjectNav任务的详细设置，涉及Habitat-Sim和Habitat-Lab的配置参数。
+# 具体配置包括任务路径、GPU设置、训练参数、评估设置、日志输出、以及模仿学习和强化学习的细节。
 # 这些设置旨在确保模型能够在仿真环境中有效地训练和评估，并且能够重现论文中报告的结果。
 BASE_TASK_CONFIG_PATH: "configs/tasks/objectnav_hm3d.yaml"
 CMD_TRAILING_OPTS: ["TASK_CONFIG.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS", "50000"]
