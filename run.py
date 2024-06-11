@@ -1,3 +1,4 @@
+# 一个用于运行实验的脚本
 #!/usr/bin/env python3
 import argparse
 import os
@@ -41,7 +42,7 @@ def main():
     args = parser.parse_args()
     run_exp(**vars(args))
 
-
+# 根据配置初始化随机种子，并根据运行类型选择执行训练或评估。
 def execute_exp(config: Config, run_type: str) -> None:
     r"""This function runs the specified config with the specified runtype
     Args:
