@@ -1,3 +1,5 @@
+# 这段配置文件详细定义了在Habitat环境中使用PPO算法进行ObjectNav任务训练的各种参数。
+# 具体配置包括任务路径、GPU设置、训练参数、评估设置、日志输出，以及PPO和DDPPO的详细参数。
 BASE_TASK_CONFIG_PATH: "configs/tasks/objectnav_hm3d.yaml"
 CMD_TRAILING_OPTS: ["TASK_CONFIG.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS", "50000"]
 ENV_NAME: "SimpleRLEnv"
