@@ -1,3 +1,5 @@
+# 实现了一个基于PPO算法的深度强化学习代理类，并添加了分布式训练的支持。
+# 通过实现PPO算法并结合分布式训练，提供了一个高效的强化学习框架。
 from typing import Optional, Tuple
 
 import torch
