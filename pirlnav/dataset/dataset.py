@@ -1,3 +1,5 @@
+# 用于加载对象导航数据集的Python脚本.
+# 定义了一个用于加载对象导航数据集的类，并包含了一系列用于处理和预处理数据的方法和属性。
 #!/usr/bin/env python3
 
 # Copyright (c) Facebook, Inc. and its affiliates.
