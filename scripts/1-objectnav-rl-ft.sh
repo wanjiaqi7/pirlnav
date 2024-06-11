@@ -24,9 +24,9 @@ export MASTER_ADDR
 
 config="configs/experiments/rl_ft_objectnav.yaml"
 
-DATA_PATH="data/datasets/objectnav/objectnav_hm3d/objectnav_hm3d_v1/"
-TENSORBOARD_DIR="tb/objectnav_il_rl_ft/ovrl_resnet50/seed_1/"
-CHECKPOINT_DIR="data/new_checkpoints/objectnav_il_rl_ft/ovrl_resnet50/seed_1/"
+DATA_PATH="data/datasets/objectnav/objectnav_hm3d/objectnav_hm3d_v1/"    # 数据集路径
+TENSORBOARD_DIR="tb/objectnav_il_rl_ft/ovrl_resnet50/seed_1/"            # TensorBoard 日志目录
+CHECKPOINT_DIR="data/new_checkpoints/objectnav_il_rl_ft/ovrl_resnet50/seed_1/"            # 检查点保存目录
 PRETRAINED_WEIGHTS=$1
 
 mkdir -p $TENSORBOARD_DIR
