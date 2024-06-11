@@ -47,7 +47,7 @@ set -x
 echo "In ObjectNav IL DDP"
 srun python -u -m run \          # srun 命令用于在集群上启动Python脚本。其路径可能是run模块的相对路径。
 --exp-config $config \
---run-type train \
+--run-type train \               # 目的是进行训练，配置了一个训练任务，使用给定的数据集和配置文件
 TENSORBOARD_DIR $TENSORBOARD_DIR \
 CHECKPOINT_FOLDER $CHECKPOINT_DIR \
 NUM_UPDATES 20000 \
