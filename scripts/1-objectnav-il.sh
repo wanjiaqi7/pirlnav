@@ -2,17 +2,17 @@
 # SLURM(Simple Linux Utility for Resource Management) 是一个开源的集群资源管理器，用于管理大规模的计算集群资源。S
 
 #!/bin/bash
-#SBATCH --job-name=pirlnav
-#SBATCH --gres gpu:4
-#SBATCH --nodes 1
-#SBATCH --cpus-per-task 10
-#SBATCH --ntasks-per-node 4
-#SBATCH --signal=USR1@1000
-#SBATCH --partition=short
-#SBATCH --constraint=a40
-#SBATCH --output=slurm_logs/ddpil-train-%j.out
-#SBATCH --error=slurm_logs/ddpil-train-%j.err
-#SBATCH --requeue
+#SBATCH --job-name=pirlnav       ###该作业的作业名（必选）
+#SBATCH --gres gpu:4             ###指定GPU资源
+#SBATCH --nodes 1                ###该作业需要的节点数（必选）
+#SBATCH --cpus-per-task 10       ###每个任务进程所需要的CPU核数，针对多线程任务，默认1（可选）
+#SBATCH --ntasks-per-node 4       ###每个节点所运行的进程数（可选）   即每个节点运行4个任务，每个任务分配10个CPU
+#SBATCH --signal=USR1@1000        ###作业终止前1000秒（约16分钟）发送一个 USR1 信号给作业，提前通知作业它即将被终止
+#SBATCH --partition=short          ###设置分区名（必选）
+#SBATCH --constraint=a40           ### 约束条件，指定只在符合 a40 特性（如 GPU 类型为 A40）的节点上运行作业
+#SBATCH --output=slurm_logs/ddpil-train-%j.out    ###指定输出文件输出
+#SBATCH --error=slurm_logs/ddpil-train-%j.err   ###指定错误文件输出
+#SBATCH --requeue          ### 使作业在被中断时（如节点故障或其他原因）重新排队，以便在稍后继续运行
 
 source /srv/flash1/rramrakhya6/miniconda3/etc/profile.d/conda.sh   #  用于加载 Conda 环境的路径
 conda deactivate
