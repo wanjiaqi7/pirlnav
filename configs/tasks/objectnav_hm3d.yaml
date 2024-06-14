@@ -1,25 +1,25 @@
 # 这段配置文件定义了用于ObjectNav任务的各种参数，包括环境配置、模拟器配置、场景配置、任务配置和数据集配置。
 # 它们共同作用，确保在训练和评估过程中能够准确模拟和控制代理的行为。
-ENVIRONMENT:
-  MAX_EPISODE_STEPS: 500
+ENVIRONMENT:  # 环境设置
+  MAX_EPISODE_STEPS: 500      # 每个episode（一个完整的任务执行过程）的最大步数
 
-SIMULATOR:
-  FORWARD_STEP_SIZE: 0.25
-  TURN_ANGLE: 30
-  TILT_ANGLE: 30
-  ACTION_SPACE_CONFIG: "v1"
-  AGENT_0:
-    SENSORS: ['RGB_SENSOR']
-    HEIGHT: 0.88
-    RADIUS: 0.18
-  HABITAT_SIM_V0:
-    GPU_DEVICE_ID: 0
-    ALLOW_SLIDING: False
-  SEMANTIC_SENSOR:
-    WIDTH: 640
-    HEIGHT: 480
-    HFOV: 79
-    POSITION: [0, 0.88, 0]
+SIMULATOR:  # 模拟器设置
+  FORWARD_STEP_SIZE: 0.25   # 每次前进的步长
+  TURN_ANGLE: 30            # 每次旋转的角度
+  TILT_ANGLE: 30            #  倾斜角度
+  ACTION_SPACE_CONFIG: "v1"           # 动作空间配置版本，这里使用了 "v1"
+  AGENT_0:       # 代理者（机器人）的设置
+    SENSORS: ['RGB_SENSOR']            # 代理者使用的传感器列表，这里包括了 RGB_SENSOR
+    HEIGHT: 0.88                      #  代理者的高度
+    RADIUS: 0.18                      # 代理者的半径
+  HABITAT_SIM_V0:                     # 模拟器类型设置
+    GPU_DEVICE_ID: 0                  # 使用的GPU设备编号，这里设置为0
+    ALLOW_SLIDING: False              #  是否允许滑动行为，设置为False
+  SEMANTIC_SENSOR:                    # 传感器设置
+    WIDTH: 640                        # 传感器的宽度，以像素为单位
+    HEIGHT: 480                       # 传感器的高度，以像素为单位。
+    HFOV: 79                          # 传感器的水平视场角
+    POSITION: [0, 0.88, 0]            # 传感器在机器人身上的位置，通常是一个三维坐标 [x, y, z]
   RGB_SENSOR:
     WIDTH: 640
     HEIGHT: 480
@@ -32,37 +32,37 @@ SIMULATOR:
     MIN_DEPTH: 0.5
     MAX_DEPTH: 5.0
     POSITION: [0, 0.88, 0]
-SCENE_DATASET: "data/scene_datasets/hm3d/hm3d_annotated_basis.scene_dataset_config.json"   ## 加载HM3D场景数据集
-TASK:
-  TYPE: ObjectNav-v2
-  POSSIBLE_ACTIONS: ["STOP", "MOVE_FORWARD", "TURN_LEFT", "TURN_RIGHT", "LOOK_UP", "LOOK_DOWN"]
-  SUCCESS_DISTANCE: 0.1
+SCENE_DATASET: "data/scene_datasets/hm3d/hm3d_annotated_basis.scene_dataset_config.json"   ## 场景数据集的配置文件路径，用于加载不同的场景和场景属性
+TASK:      # 任务设置 
+  TYPE: ObjectNav-v2       # 任务类型，这里是 ObjectNav-v2，即目标导航任务的第二个版本
+  POSSIBLE_ACTIONS: ["STOP", "MOVE_FORWARD", "TURN_LEFT", "TURN_RIGHT", "LOOK_UP", "LOOK_DOWN"]      # 可能的动作列表，包括停止、前进、左转、右转、向上看和向下看。
+  SUCCESS_DISTANCE: 0.1          # 成功到达目标的距离阈值，设置为0.1米。
 
-  SENSORS: ['OBJECTGOAL_SENSOR', 'COMPASS_SENSOR', 'GPS_SENSOR']
-  GOAL_SENSOR_UUID: objectgoal
+  SENSORS: ['OBJECTGOAL_SENSOR', 'COMPASS_SENSOR', 'GPS_SENSOR']     # 使用的传感器列表
+  GOAL_SENSOR_UUID: objectgoal          # 目标传感器的唯一标识符，这里设为 objectgoal
   
-  DEMONSTRATION_SENSOR:
+  DEMONSTRATION_SENSOR:                # 演示传感器的类型和唯一标识符。
     TYPE: DemonstrationSensor
   DEMONSTRATION_SENSOR_UUID: "next_actions"
 
-  INFLECTION_WEIGHT_SENSOR:
+  INFLECTION_WEIGHT_SENSOR:            # 词形权重传感器的类型、系数和唯一标识符。
     TYPE: InflectionWeightSensor
     INFLECTION_COEF: 3.477512060914205
 
   INFLECTION_WEIGHT_SENSOR_UUID: "inflection_weight"
 
-  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'SOFT_SPL', 'SPARSE_REWARD']
+  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'SOFT_SPL', 'SPARSE_REWARD']       # 测量值列表，包括到目标的距离、成功与否、SPL（Success weighted by Path Length）、SOFT_SPL、SPARSE_REWARD 等。
 
-  DISTANCE_TO_GOAL:
+  DISTANCE_TO_GOAL:                   # 到目标的距离测量设置。
     DISTANCE_TO: VIEW_POINTS
 
-  SUCCESS:
+  SUCCESS:                           # 成功到达目标的设置，包括成功的距离阈值
     SUCCESS_DISTANCE: 0.1
 ## 以下是加载导航任务的情景数据集
 DATASET:
-  TYPE: ObjectNav-v2
-  SPLIT: train
-  DATA_PATH: "data/datasets/objectnav/objectnav_hm3d/objectnav_hm3d_v1/{split}/{split}.json.gz"
-  SCENES_DIR: "data/scene_datasets/"
-  MAX_EPISODE_STEPS: 500
+  TYPE: ObjectNav-v2          # 数据集类型，这里也是 ObjectNav-v2
+  SPLIT: train             # 数据集的划分方式，这里设置为训练集 
+  DATA_PATH: "data/datasets/objectnav/objectnav_hm3d/objectnav_hm3d_v1/{split}/{split}.json.gz"       # 数据文件的路径，使用了 {split} 变量来表示数据集划分的子目录
+  SCENES_DIR: "data/scene_datasets/"       # 场景数据集的根目录路径
+  MAX_EPISODE_STEPS: 500             # 每个episode的最大步数，同样设置为500步
 
