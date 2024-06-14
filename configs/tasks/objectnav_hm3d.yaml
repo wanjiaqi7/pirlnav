@@ -32,7 +32,7 @@ SIMULATOR:
     MIN_DEPTH: 0.5
     MAX_DEPTH: 5.0
     POSITION: [0, 0.88, 0]
-SCENE_DATASET: "data/scene_datasets/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
+SCENE_DATASET: "data/scene_datasets/hm3d/hm3d_annotated_basis.scene_dataset_config.json"   ## 加载HM3D场景数据集
 TASK:
   TYPE: ObjectNav-v2
   POSSIBLE_ACTIONS: ["STOP", "MOVE_FORWARD", "TURN_LEFT", "TURN_RIGHT", "LOOK_UP", "LOOK_DOWN"]
@@ -58,7 +58,7 @@ TASK:
 
   SUCCESS:
     SUCCESS_DISTANCE: 0.1
-
+## 以下是加载导航任务的情景数据集
 DATASET:
   TYPE: ObjectNav-v2
   SPLIT: train
