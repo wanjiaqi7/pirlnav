@@ -30,7 +30,7 @@ class ObjectNavDatasetV2(PointNavDatasetV1):
     category_to_task_category_id: Dict[str, int]
     category_to_scene_annotation_category_id: Dict[str, int]
     episodes: List[ObjectGoalNavEpisode] = []  # type: ignore
-    content_scenes_path: str = "{data_path}/content/{scene}.json.gz"
+    content_scenes_path: str = "{data_path}/content/{scene}.json.gz"   #用于指定情景（episodes）的路径，即导航任务中的具体情景。
     goals_by_category: Dict[str, Sequence[ObjectGoal]]
     gibson_to_mp3d_category_map: Dict[str, str] = {'couch': 'sofa', 'toilet': 'toilet', 'bed': 'bed', 'tv': 'tv_monitor', 'potted plant': 'plant', 'chair': 'chair'}
     max_episode_steps: int = 500
